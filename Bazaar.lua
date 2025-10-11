@@ -1,3 +1,10 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local AutoLevel_Enabled = _G.AutoLevel_Enabled or false
+local AutoLevel = _G.AutoLevel or function() end
+
 local AutoRebirth_Active = false
 local AutoRebirth_Enabled = false
 local WasAutoLevelRunning = false
@@ -132,6 +139,7 @@ local function AutoRebirth(state)
                         if AutoRebirth_Enabled then
                             local currentLevel = playerData.Level.Value
                             if currentLevel % 100 == 0 then
+                                -- Do nothing
                             end
                         end
                     end
@@ -149,4 +157,8 @@ local function AutoRebirth(state)
         AutoRebirth_Active = false
         AUTO_FIRE = false
     end
+    
+    return AutoRebirth_Enabled
 end
+
+return AutoRebirth
