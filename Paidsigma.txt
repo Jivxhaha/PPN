@@ -1,0 +1,1229 @@
+-- Project Baki 3 | SIGMA
+    local Players = game:GetService("Players")
+    local HttpService = game:GetService("HttpService")
+    local TeleportService = game:GetService("TeleportService")
+    local TweenService = game:GetService("TweenService")
+    local RunService = game:GetService("RunService")
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local Api = "https://games.roblox.com/v1/games/"
+    local LocalPlayer = Players.LocalPlayer
+    local _place, _id = game.PlaceId, game.JobId
+    local _servers = Api.._place.."/servers/Public?sortOrder=Asc&limit=10"
+
+    if _place ~= 5951002734 then
+        LocalPlayer:Kick("Script not supported for this game")
+        return
+    end
+
+    local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/memejames/elerium-v2-ui-library/main/Library", true))()
+
+    local theme = {
+        main = Color3.fromRGB(45, 45, 45),
+        accent = Color3.fromRGB(0, 170, 255),
+        text = Color3.fromRGB(255, 255, 255),
+        dark = Color3.fromRGB(30, 30, 30),
+        light = Color3.fromRGB(60, 60, 60),
+        success = Color3.fromRGB(0, 200, 0),
+        warning = Color3.fromRGB(255, 150, 0),
+        danger = Color3.fromRGB(200, 0, 0)
+    }
+
+    local window = library:AddWindow("Project Baki 3 | SIGMA", {
+        main_color = theme.main,
+        min_size = Vector2.new(300, 400),
+        max_size = Vector2.new(400, 600),
+        toggle_key = Enum.KeyCode.RightShift,
+        can_resize = true
+    })
+
+    spawn(function()
+        while true do
+            local t = tick()
+            window.main_frame.Position = UDim2.new(
+                window.main_frame.Position.X.Scale,
+                window.main_frame.Position.X.Offset,
+                window.main_frame.Position.Y.Scale + math.sin(t * 1.5) * 0.002,
+                window.main_frame.Position.Y.Offset
+            )
+            RunService.RenderStepped:Wait()
+        end
+    end)
+
+    local autoFarmTab = window:AddTab("Auto Farm")
+    local teleportTab = window:AddTab("Teleport")
+    local miscTab = window:AddTab("Miscellaneous")
+
+    local isFollowingPlayer = false
+
+    local function FollowPlayer()
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local healPlate = workspace.Game.Map1.City.Arena.HealPlate
+
+        healPlate.Size = Vector3.new(0.1, 0.1, 0.1)
+        healPlate.Transparency = 1
+        healPlate.CanCollide = false
+
+        local function updateHealPlatePosition()
+            if character and character:FindFirstChild("HumanoidRootPart") then
+                healPlate.CFrame = character.HumanoidRootPart.CFrame
+            end
+        end
+
+        while isFollowingPlayer do
+            updateHealPlatePosition()
+            wait(0.2)
+        end
+    end
+
+    local function ToggleFollowPlayer(state)
+        isFollowingPlayer = state
+        if isFollowingPlayer then
+            FollowPlayer()
+        end
+    end
+
+    local function OneShotMode(state)
+        getgenv().G = state
+        getgenv().Creator = 'ME - MMMoC'
+
+        local namegu = Game.Players.LocalPlayer.Name
+
+        local targetNPCs = {
+            ["Spec"] = true, ["Doyle"] = true, ["Pickle"] = true,
+            ["Kiyosumi Kato"] = true, ["KiryuKazuma"] = true, ["Yasha Ape Jr."] = true,
+            ["Headless One"] = true, ["Musashi"] = true, ["Raian"] = true,
+            ["Armstrong"] = true, ["Jason Voorhees"] = true, ["Jetstream Sam"] = true,
+            ["AdamSmasher"] = true, ["Retsu"] = true, ["Yanagi"] = true,
+            ["Predator"] = true, ["Leatherface"] = true, ["Slayer"] = true,
+            ["Dorian"] = true, ["The Protagonist"] = true,
+            ["Goro Majima, Mad Dog of Shimano"] = true,
+            ["Sukune"] = true, ["Sikorsky"] = true, ["DungeonNPC"] = true,
+            ["BossNPC"] = true, ["Starrk"] = true, ["Awano"] = true, ["Ichiban"] = true,
+            ["Mr. Shakedown"] = true, ["Yakuza"] = true, ["Jack"] = true, ["Kureha"] = true,
+            ["Gouki"] = true, ["Koushou"] = true, ["Sukune"] = true, ["Chiharu"] = true,
+            ["Yujiro Hanma (20% Power)"] = true, ["Pirate"] = true, ["Fireleton"] = true,
+            ["The First Yasha Ape"] = true, ["Yeti"] = true, ["Skeleton"] = true, ["Jolly Skeleton"] = true,
+            ["Captain Majima"] = true, ["Radahn, Consort of Miquella"] = true, ["Military"] = true, ["SWAT"] = true,
+            ["Yasha Ape"] = true, ["Hanma Yujiro"] = true, ["Hanma Baki"] = true, ["Doomfist"] = true, ["Kokushibo"] = true,
+            ["Yasha Ape Sr."] = true, ["First Yasha Ape"] = true, ["Jiren"] = true, ["Broly"] = true, [namegu .. " Musashi"] = true,
+            ["Sane Man"] = true, ["Go Todoroki"] = true,
+        }
+
+        while getgenv().G and getgenv().Creator == 'ME - MMMoC' do
+            wait(0.1)
+            sethiddenproperty(LocalPlayer, "SimulationRadius", 100)
+            sethiddenproperty(LocalPlayer, "MaxSimulationRadius", 100)
+
+            for _, npc in pairs(workspace.Game.Players:GetDescendants()) do
+                if npc:IsA("Humanoid") and npc.Parent and targetNPCs[npc.Parent.Name] then
+                    npc.Health = 0
+                end
+            end
+        end
+    end
+
+    local AutoLevel_Active = false
+
+local function AutoLevel(state)
+    AutoLevel_Active = state
+    
+    while AutoLevel_Active do
+        local success, error = pcall(function()
+            local args = {
+                "Level 4",
+                workspace:WaitForChild("Game"):WaitForChild("Rings"):WaitForChild("Ring")
+            }
+            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ClientToServer"):WaitForChild("Sparring"):InvokeServer(unpack(args))
+        end)
+        
+        if not success then
+            warn("Failed1")
+        end
+        
+        wait(0.1)
+    end
+end
+
+local AutoShadow_Active = false
+
+local function AutoShadow(state)
+    AutoShadow_Active = state
+    
+    local function waitForHRP()
+        local char = LocalPlayer.Character
+        if not char then
+            char = LocalPlayer.CharacterAdded:Wait()
+        end
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        while not hrp and AutoShadow_Active do
+            char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+            hrp = char:FindFirstChild("HumanoidRootPart")
+            wait(0.1)
+        end
+        return char, hrp
+    end
+    
+    while AutoShadow_Active do
+        local character, hrp = waitForHRP()
+        if not AutoShadow_Active then break end
+        
+        local playerName = LocalPlayer.Name
+        local shadowName = playerName .. " Musashi"
+        local shadowNPC = workspace.Game.Players:FindFirstChild(shadowName)
+        
+        if shadowNPC and shadowNPC:FindFirstChild("HumanoidRootPart") and hrp then
+            local shadowHRP = shadowNPC.HumanoidRootPart
+            local behindPosition = shadowHRP.CFrame * CFrame.new(0, 0, 5)
+            
+            hrp.CFrame = behindPosition
+            wait(0.5)
+            hrp.Anchored = true
+            
+            local attackCounter = 0
+            while AutoShadow_Active and shadowNPC and shadowNPC:FindFirstChild("HumanoidRootPart") and hrp and hrp.Anchored do
+                local humanoid = character:FindFirstChildOfClass("Humanoid")
+                if not humanoid or humanoid.Health <= 0 then
+                    break
+                end
+                
+                if attackCounter % 2 == 0 then
+                    local args = {"Batarang Assault"}
+                    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ClientToServer"):WaitForChild("Skill"):FireServer(unpack(args))
+                else
+                    local args = {"Grapple Hook"}
+                    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ClientToServer"):WaitForChild("Skill"):FireServer(unpack(args))
+                end
+                
+                attackCounter = attackCounter + 1
+                wait(0.1)
+                
+                if shadowNPC and shadowNPC:FindFirstChild("HumanoidRootPart") and hrp then
+                    local newBehindPosition = shadowNPC.HumanoidRootPart.CFrame * CFrame.new(0, 0, 5)
+                    hrp.CFrame = newBehindPosition
+                end
+            end
+            
+            if hrp then
+                hrp.Anchored = false
+            end
+            
+        else
+            if hrp then
+                hrp.Anchored = false
+                wait(1)
+                local args = {"Musashi"}
+                game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ClientToServer"):WaitForChild("ShadowBoxing"):InvokeServer(unpack(args))
+            end
+            print("Shadow not found - spawning new one")
+        end
+        
+        wait(0.5)
+    end
+    
+    local character = LocalPlayer.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        character.HumanoidRootPart.Anchored = false
+    end
+end
+
+    local AutoBalraxion_Speed = 0.1
+
+    local function AutoBalraxion(state)
+        AutoBalraxion_Active = state
+        
+        if not AutoBalraxion_Active then
+            return
+        end
+        
+        local flatPart = Instance.new("Part")
+        flatPart.Name = "BalraxionPlatform"
+        flatPart.Anchored = true
+        flatPart.CanCollide = true
+        flatPart.Size = Vector3.new(50, 1, 50)
+        flatPart.Position = Vector3.new(-8570, 8137, -1853)
+        flatPart.Color = Color3.fromRGB(255, 255, 255)
+        flatPart.Material = Enum.Material.Plastic
+        flatPart.Transparency = 0.9
+        flatPart.Parent = workspace
+
+        local ragdollStartTime = 0
+        local isRagdolled = false
+
+        local function checkRagdollStatus()
+            while AutoBalraxion_Active do
+                local character = LocalPlayer.Character
+                if character then
+                    local ragdolled = character:FindFirstChild("Ragdolled")
+                    if ragdolled then
+                        if not isRagdolled then
+                            ragdollStartTime = tick()
+                            isRagdolled = true
+                        else
+                            if tick() - ragdollStartTime > 4 then
+                                local humanoid = character:FindFirstChildOfClass("Humanoid")
+                                if humanoid and humanoid.Health > 0 then
+                                    humanoid.Health = 0
+                                end
+                                isRagdolled = false
+                            end
+                        end
+                    else
+                        isRagdolled = false
+                        ragdollStartTime = 0
+                    end
+                end
+                wait(0.5)
+            end
+        end
+
+        spawn(checkRagdollStatus)
+
+        local trainerValue = LocalPlayer.Data.Trainer.Value
+        if trainerValue ~= "SquidyCakez" then
+            local args = {"SquidyCakez"}
+            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ClientToServer"):WaitForChild("Quest"):InvokeServer(unpack(args))
+            LocalPlayer.CharacterAdded:Wait()
+            wait(3)
+        end
+
+        local function waitForHRP()
+            local char = LocalPlayer.Character
+            if not char then
+                char = LocalPlayer.CharacterAdded:Wait()
+            end
+            local hrp = char:FindFirstChild("HumanoidRootPart")
+            while not hrp and AutoBalraxion_Active do
+                char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                hrp = char:FindFirstChild("HumanoidRootPart")
+                wait(0.1)
+            end
+            return char, hrp
+        end
+
+        local function attackUntilBossDies()
+            if not AutoBalraxion_Active then return end
+            
+            local bossesFolder = workspace:WaitForChild("Game"):WaitForChild("Bosses")
+            local counter = 0
+            
+            while AutoBalraxion_Active do
+                counter = (counter % 5) + 1
+                local balraxionBoss = bossesFolder:FindFirstChild("Balraxion")
+                local bossExists = balraxionBoss and balraxionBoss:FindFirstChild("Boss") and balraxionBoss.Boss:FindFirstChild("Balraxion")
+                
+                if not bossExists then
+                    break
+                end
+                
+                local boss = balraxionBoss.Boss.Balraxion
+                local humanoid = boss:FindFirstChild("Humanoid")
+
+                local beamExists = false
+                pcall(function()
+                    if boss and boss:FindFirstChild("BeamHitbox") then
+                        beamExists = true
+                    end
+                end)
+
+                if beamExists then
+                    local char = LocalPlayer.Character
+                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                    if hrp and flatPart then
+                        local origCFrame = hrp.CFrame
+                        pcall(function()
+                            hrp.CFrame = flatPart.CFrame + Vector3.new(0, 3, 0)
+                            hrp.Anchored = false
+                        end)
+
+                        local waited = 0
+                        while AutoBalraxion_Active and waited < 3 do
+                            wait(0.1)
+                            waited = waited + 0.1
+                        end
+
+                        pcall(function()
+                            if hrp then
+                                hrp.CFrame = origCFrame
+                                wait(1)
+                                hrp.Anchored = true
+                                attackUntilBossDies()
+                            end
+                        end)
+                    else
+                        wait(3)
+                    end
+
+                    if not AutoBalraxion_Active then break end
+                    continue
+                end
+                
+                if humanoid and humanoid.Health > 0 then
+                    local char = LocalPlayer.Character
+                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        pcall(function()
+                            hrp.Anchored = true
+                        end)
+                    end
+
+                    local args = {
+                        "Light Punche",
+                        counter,
+                        humanoid,
+                        [6] = false,
+                        [7] = false
+                    }
+                    
+                    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ClientToServer"):WaitForChild("BasicCombat"):FireServer(unpack(args))
+                end
+                
+                if counter == 5 then
+                    wait(1)
+                else
+                    wait(AutoBalraxion_Speed)
+                end
+            end
+        end
+
+        local function mainLoop()
+            while AutoBalraxion_Active do
+                local character, hrp = waitForHRP()
+                if not AutoBalraxion_Active then break end
+                
+                local bossesFolder = workspace:WaitForChild("Game"):WaitForChild("Bosses")
+                local balraxionBoss = bossesFolder:FindFirstChild("Balraxion")
+                local bossExists = balraxionBoss and balraxionBoss:FindFirstChild("Boss") and balraxionBoss.Boss:FindFirstChild("Balraxion")
+                
+                if not bossExists then
+                    if hrp and workspace.Game.Raids:FindFirstChild("Balraxion") then
+                        hrp.CFrame = workspace.Game.Raids.Balraxion.CFrame
+                        pcall(function()
+                            if hrp then
+                                hrp.Anchored = false
+                            end
+                        end)
+                        wait(1)
+                        
+                        local args = {
+                            [1] = "Balraxion",
+                            [2] = "Balraxion",
+                            [3] = workspace.Game.Raids.Balraxion
+                        }
+                        ReplicatedStorage.Remotes.ClientToServer.BossStart:FireServer(unpack(args))
+                    end
+                    
+                    local bossAppeared = false
+                    local waitTime = 0
+                    while AutoBalraxion_Active and not bossAppeared and waitTime < 10 do
+                        wait(1)
+                        waitTime = waitTime + 1
+                        if not AutoBalraxion_Active then break end
+                        
+                        balraxionBoss = bossesFolder:FindFirstChild("Balraxion")
+                        bossExists = balraxionBoss and balraxionBoss:FindFirstChild("Boss") and balraxionBoss.Boss:FindFirstChild("Balraxion")
+                        if bossExists then
+                            bossAppeared = true
+                        end
+                    end
+                end
+                
+                if AutoBalraxion_Active and bossExists then
+                    if hrp then
+                        hrp.CFrame = CFrame.new(-8570, 7650, -1853)
+                    end
+                    
+                    wait(2)
+                    if not AutoBalraxion_Active then break end
+                    
+                    attackUntilBossDies()
+                    
+                    if AutoBalraxion_Active then
+                        wait(3)
+                    end
+                end
+                
+                if AutoBalraxion_Active then
+                    wait(1)
+                end
+            end
+        end
+
+        spawn(function()
+            while AutoBalraxion_Active do
+                local success, err = pcall(mainLoop)
+                
+                if not success and AutoBalraxion_Active then
+                    wait(3)
+                elseif not AutoBalraxion_Active then
+                    break
+                end
+                
+                if AutoBalraxion_Active then
+                    LocalPlayer.CharacterAdded:Wait()
+                    wait(3)
+                end
+            end
+            print("stopped")
+        end)
+    end
+
+    local AutoIsland_Active = false
+    local hasTeleportedIsland = false
+
+    local function getIslandBoatAndDest()
+        if workspace:FindFirstChild("Game")
+            and workspace.Game:FindFirstChild("Map1")
+            and workspace.Game.Map1:FindFirstChild("Island") then
+            local boat = workspace.Game.Map1.Island:FindFirstChild("BoatBoat")
+            if boat then
+                local destPart
+                if boat:IsA("BasePart") then
+                    destPart = boat
+                elseif boat.PrimaryPart then
+                    destPart = boat.PrimaryPart
+                else
+                    destPart = boat:FindFirstChildWhichIsA("BasePart")
+                end
+                return boat, destPart
+            end
+        end
+        return nil, nil
+    end
+
+    local function AutoIsland(state)
+        AutoIsland_Active = state
+
+        local function waitForHRP()
+            local char = LocalPlayer.Character
+            if not char then
+                char = LocalPlayer.CharacterAdded:Wait()
+            end
+
+            local hrp = char:FindFirstChild("HumanoidRootPart")
+            local retries = 0
+            while (not hrp) do
+                char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                hrp = char:FindFirstChild("HumanoidRootPart")
+                retries = retries + 1
+                if retries % 5 == 0 then wait(0.1) end
+                wait(0.1)
+            end
+            return char, hrp
+        end
+
+        local function CheckAndRestartIsland()
+            while AutoIsland_Active do
+                local islandActive = workspace.Game.Map1:FindFirstChild("Island")
+                local summerBoxDisabled = false
+                
+                if workspace:FindFirstChild("SummerBox") and workspace.SummerBox:FindFirstChild("BillboardGui") then
+                    local ok, enabled = pcall(function()
+                        return workspace.SummerBox.BillboardGui.Enabled
+                    end)
+                    if ok and enabled == false then
+                        summerBoxDisabled = true
+                    end
+                end
+
+                if not islandActive and summerBoxDisabled then
+                    local character, hrp = waitForHRP()
+
+                    local function abortIfStopped()
+                        if not AutoIsland_Active then
+                            return true
+                        end
+                        return false
+                    end
+
+                    local function interruptibleWait(duration)
+                        local elapsed = 0
+                        local step = 0.1
+                        while elapsed < duration do
+                            if abortIfStopped() then
+                                return false
+                            end
+                            wait(step)
+                            elapsed = elapsed + step
+                        end
+                        return true
+                    end
+
+                    local function checkIslandExists()
+                        return workspace.Game.Map1:FindFirstChild("Island")
+                    end
+
+                    if abortIfStopped() then return end
+
+                    if not hasTeleportedIsland then
+                        character, hrp = waitForHRP()
+                        if abortIfStopped() then return end
+                        if hrp then
+                            hrp.CFrame = CFrame.new(1102.9104, 2096.59912, -357.396606)
+                        end
+                        hasTeleportedIsland = true
+                    end
+                    
+                    if not interruptibleWait(1) then return end
+                    if abortIfStopped() then return end
+
+                    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ClientToServer"):WaitForChild("Summer"):FireServer()
+
+                    if not interruptibleWait(16) then return end
+                    if abortIfStopped() then return end
+
+                    if not checkIslandExists() then
+                        hasTeleportedIsland = false
+                        wait(2.5)
+                        CheckAndRestartIsland()
+                        wait(1)
+                        return
+                    end
+
+                    character, hrp = waitForHRP()
+                    if abortIfStopped() then return end
+                    if hrp then hrp.CFrame = CFrame.new(21759, 2106, -4497) end
+                    if not interruptibleWait(15.5) then return end
+
+                    if abortIfStopped() then return end
+                    character, hrp = waitForHRP()
+                    if hrp then hrp.CFrame = CFrame.new(22169, 2106, -4507) end
+                    if not interruptibleWait(15.5) then return end
+
+                    if abortIfStopped() then return end
+                    character, hrp = waitForHRP()
+                    if hrp then hrp.CFrame = CFrame.new(22169, 2106, -5055) end
+                    if not interruptibleWait(15.5) then return end
+
+                    if abortIfStopped() then return end
+                    character, hrp = waitForHRP()
+                    if hrp then hrp.CFrame = CFrame.new(21719, 2106, -5002) end
+                    if not interruptibleWait(2) then return end
+
+do
+                        local maxWait = 30
+                        local elapsed = 0
+                        local step = 0.5
+                        while elapsed < maxWait do
+                            if abortIfStopped() then return end
+                            local ok, hasWind = pcall(function()
+                                return workspace and workspace:FindFirstChild("Game")
+                                    and workspace.Game:FindFirstChild("Effects")
+                                    and workspace.Game.Effects:FindFirstChild("Wind")
+                            end)
+                            if ok and hasWind then
+                                wait(2)
+                                break
+                            end
+                            wait(step)
+                            elapsed = elapsed + step
+                        end
+                        if elapsed >= maxWait and not (ok and hasWind) then
+                            -- do nothing
+                        end
+                    end
+ 
+                     do
+                         local boat, destPart = getIslandBoatAndDest()
+                         if boat and destPart then
+                             character, hrp = waitForHRP()
+                             if abortIfStopped() then return end
+                             if hrp then hrp.CFrame = destPart.CFrame + Vector3.new(0, 3, 0) end
+                             if not interruptibleWait(1) then return end
+                             if abortIfStopped() then return end
+                             for _, obj in pairs(boat:GetDescendants()) do
+                                 if abortIfStopped() then return end
+                                 if obj:IsA("ClickDetector") then
+                                     pcall(function()
+                                         if fireclickdetector then
+                                             fireclickdetector(obj)
+                                         end
+                                     end)
+                                 end
+                             end
+                         end
+                     end
+
+                    if not interruptibleWait(5) then return end
+                    if abortIfStopped() then return end
+
+                    character, hrp = waitForHRP()
+                    if abortIfStopped() then return end
+                    if hrp then hrp.CFrame = CFrame.new(11972, 2109, -5789) end
+                    if not interruptibleWait(15.5) then return end
+
+                    if abortIfStopped() then return end
+                    character, hrp = waitForHRP()
+                    if hrp then hrp.CFrame = CFrame.new(12438, 2109, -5901) end
+                    if not interruptibleWait(15.5) then return end
+
+                    if abortIfStopped() then return end
+                    character, hrp = waitForHRP()
+                    if hrp then hrp.CFrame = CFrame.new(12345, 2109, -6379) end
+                    if not interruptibleWait(15.5) then return end
+
+                    if abortIfStopped() then return end
+                    character, hrp = waitForHRP()
+                    if hrp then hrp.CFrame = CFrame.new(11889, 2107, -6323) end
+                    if not interruptibleWait(1) then return end
+
+do
+                        local maxWait = 30
+                        local elapsed = 0
+                        local step = 0.5
+                        while elapsed < maxWait do
+                            if abortIfStopped() then return end
+                            local ok, hasWind = pcall(function()
+                                return workspace and workspace:FindFirstChild("Game")
+                                    and workspace.Game:FindFirstChild("Effects")
+                                    and workspace.Game.Effects:FindFirstChild("Wind")
+                            end)
+                            if ok and hasWind then
+                                wait(2)
+                                break
+                            end
+                            wait(step)
+                            elapsed = elapsed + step
+                        end
+                        if elapsed >= maxWait and not (ok and hasWind) then
+                            -- do nothing
+                        end
+                    end
+ 
+                     do
+                         local boat, destPart = getIslandBoatAndDest()
+                         if boat and destPart then
+                             character, hrp = waitForHRP()
+                             if abortIfStopped() then return end
+                             if hrp then hrp.CFrame = destPart.CFrame + Vector3.new(0, 3, 0) end
+                             if not interruptibleWait(1) then return end
+                             if abortIfStopped() then return end
+                             for _, obj in pairs(boat:GetDescendants()) do
+                                 if abortIfStopped() then return end
+                                 if obj:IsA("ClickDetector") then
+                                     pcall(function()
+                                         if fireclickdetector then
+                                             fireclickdetector(obj)
+                                         end
+                                     end)
+                                 end
+                             end
+                         end
+                     end
+
+                    if not interruptibleWait(5) then return end
+                    if abortIfStopped() then return end
+
+                    character, hrp = waitForHRP()
+                    if abortIfStopped() then return end
+                    if hrp then hrp.CFrame = CFrame.new(2511, 2240, -6504) end
+                    do
+                        local maxWait = 65
+                        local elapsed = 0
+                        local step = 0.5
+                        while elapsed < maxWait do
+                            if abortIfStopped() then return end
+                            local ok, hasWind = pcall(function()
+                                return workspace and workspace:FindFirstChild("Game")
+                                    and workspace.Game:FindFirstChild("Effects")
+                                    and workspace.Game.Effects:FindFirstChild("Wind")
+                            end)
+                            if ok and hasWind then
+                                wait(2)
+                                break
+                            end
+                            wait(step)
+                            elapsed = elapsed + step
+                        end
+                        if elapsed >= maxWait and not (ok and hasWind) then
+                                                    pcall(function()
+                            hasTeleportedIsland = false
+                            AutoIsland_Active = false
+
+                            local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                            local humanoid = char and char:FindFirstChildOfClass("Humanoid")
+                            if humanoid then
+                                humanoid.Health = 0
+                            end
+                        end)
+
+                        spawn(function()
+                            LocalPlayer.CharacterAdded:Wait()
+                            wait(5)
+                            AutoIsland_Active = true
+                            hasTeleportedIsland = false
+                            CheckAndRestartIsland()
+                        end)
+
+                        return
+                        end
+                    end
+ 
+                     do
+                         local boat, destPart = getIslandBoatAndDest()
+                         if boat and destPart then
+                             character, hrp = waitForHRP()
+                             if abortIfStopped() then return end
+                             if hrp then hrp.CFrame = destPart.CFrame + Vector3.new(0, 3, 0) end
+                             if not interruptibleWait(1) then return end
+                             if abortIfStopped() then return end
+                             for _, obj in pairs(boat:GetDescendants()) do
+                                 if abortIfStopped() then return end
+                                 if obj:IsA("ClickDetector") then
+                                     pcall(function()
+                                         if fireclickdetector then
+                                             fireclickdetector(obj)
+                                         end
+                                     end)
+                                 end
+                             end
+                         end
+                     end
+
+                    if not interruptibleWait(5) then return end
+                    if abortIfStopped() then return end
+
+                    character, hrp = waitForHRP()
+                    if abortIfStopped() then return end
+                    if hrp then hrp.CFrame = CFrame.new(8258, 2110, -4767) end
+                    if not interruptibleWait(15.5) then return end
+
+                    if abortIfStopped() then return end
+                    character, hrp = waitForHRP()
+                    if hrp then hrp.CFrame = CFrame.new(8309, 2116, -5271) end
+                    if not interruptibleWait(15.5) then return end
+
+                    if abortIfStopped() then return end
+                    character, hrp = waitForHRP()
+                    if hrp then hrp.CFrame = CFrame.new(7776, 2115, -5337) end
+                    if not interruptibleWait(15.5) then return end
+
+                    if abortIfStopped() then return end
+                    character, hrp = waitForHRP()
+                    if hrp then hrp.CFrame = CFrame.new(7776, 2115, -5337) end
+                    if not interruptibleWait(2) then return end
+
+                    if not interruptibleWait(1) then return end
+
+do
+                        local maxWait = 25
+                        local elapsed = 0
+                        local step = 0.5
+                        while elapsed < maxWait do
+                            if abortIfStopped() then return end
+                            local ok, hasWind = pcall(function()
+                                return workspace and workspace:FindFirstChild("Game")
+                                    and workspace.Game:FindFirstChild("Effects")
+                                    and workspace.Game.Effects:FindFirstChild("Wind")
+                            end)
+                            if ok and hasWind then
+                                wait(2)
+                                break
+                            end
+                            wait(step)
+                            elapsed = elapsed + step
+                        end
+                        if elapsed >= maxWait and not (ok and hasWind) then
+                        pcall(function()
+                            hasTeleportedIsland = false
+                            AutoIsland_Active = false
+
+                            local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                            local humanoid = char and char:FindFirstChildOfClass("Humanoid")
+                            if humanoid then
+                                humanoid.Health = 0
+                            end
+                        end)
+
+                        spawn(function()
+                            LocalPlayer.CharacterAdded:Wait()
+                            wait(5)
+                            AutoIsland_Active = true
+                            hasTeleportedIsland = false
+                            CheckAndRestartIsland()
+                        end)
+
+                        return
+                        end
+                    end
+ 
+                     do
+                         local boat, destPart = getIslandBoatAndDest()
+                         if boat and destPart then
+                             character, hrp = waitForHRP()
+                             if abortIfStopped() then return end
+                             if hrp then hrp.CFrame = destPart.CFrame + Vector3.new(0, 3, 0) end
+                             if not interruptibleWait(1) then return end
+                             if abortIfStopped() then return end
+                             for _, obj in pairs(boat:GetDescendants()) do
+                                 if abortIfStopped() then return end
+                                 if obj:IsA("ClickDetector") then
+                                     pcall(function()
+                                         if fireclickdetector then
+                                             fireclickdetector(obj)
+                                         end
+                                     end)
+                                 end
+                             end
+                         end
+                     end
+
+                    if not interruptibleWait(5) then return end
+                    if abortIfStopped() then return end
+
+
+                    do
+                        local maxWait = 165
+                        local elapsed = 0
+                        local step = 0.5
+                        while elapsed < maxWait do
+                            if abortIfStopped() then return end
+                            local ok, hasWind = pcall(function()
+                                return workspace and workspace:FindFirstChild("Game")
+                                    and workspace.Game:FindFirstChild("Effects")
+                                    and workspace.Game.Effects:FindFirstChild("Wind")
+                            end)
+                            if ok and hasWind then
+                                wait(5)
+                                break
+                            end
+                            wait(step)
+                            elapsed = elapsed + step
+                        end
+                        if elapsed >= maxWait and not (ok and hasWind) then
+                            -- do nothing
+                        end
+                    end
+ 
+                     do
+                         local boat, destPart = getIslandBoatAndDest()
+                         if boat and destPart then
+                             character, hrp = waitForHRP()
+                             if abortIfStopped() then return end
+                             if hrp then hrp.CFrame = destPart.CFrame + Vector3.new(0, 3, 0) end
+                             if not interruptibleWait(1) then return end
+                             if abortIfStopped() then return end
+                             for _, obj in pairs(boat:GetDescendants()) do
+                                 if abortIfStopped() then return end
+                                 if obj:IsA("ClickDetector") then
+                                     pcall(function()
+                                         if fireclickdetector then
+                                             fireclickdetector(obj)
+                                         end
+                                     end)
+                                 end
+                             end
+                         end
+                     end
+                end
+                wait(5)
+            end
+        end
+
+        if AutoIsland_Active then
+            hasTeleportedIsland = false
+            spawn(CheckAndRestartIsland)
+        else
+            hasTeleportedIsland = false
+        end
+    end
+
+    local AutoBR_Active = false
+    local hasTeleported = false
+
+    local function AutoBR(state)
+        AutoBR_Active = state
+
+        local function StartAutoBR()
+            local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+            local spireBox = workspace:FindFirstChild("SpireBox")
+            
+            if spireBox and character:FindFirstChild("HumanoidRootPart") then
+                if not hasTeleported then
+                    character.HumanoidRootPart.CFrame = CFrame.new(-203.598083, 2099.0481, 37.2689819)
+                    hasTeleported = true
+                end
+                
+                local args = {
+                    [1] = "Spire",
+                    [2] = "Spire",
+                    [3] = spireBox
+                }
+                wait(1)
+                ReplicatedStorage.Remotes.ClientToServer.BossStart:FireServer(unpack(args))
+            end
+        end
+
+        local function CheckAndRestartBR()
+            while AutoBR_Active do
+                if not workspace:FindFirstChild("Spire") then
+                    StartAutoBR()
+                end
+                wait(5)
+            end
+        end
+
+        if AutoBR_Active then
+            hasTeleported = false
+            StartAutoBR()
+            spawn(CheckAndRestartBR)
+        end
+    end
+
+    local AutoRelic_Active = false
+    local function AutoRelic(state)
+        AutoRelic_Active = state
+        
+        while AutoRelic_Active do
+            local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+            local trinketsFolder = workspace:FindFirstChild("Game") and 
+                                workspace.Game:FindFirstChild("Trinkets") and 
+                                workspace.Game.Trinkets:FindFirstChild("Spawned")
+
+            if trinketsFolder and character:FindFirstChild("HumanoidRootPart") then
+                for _, trinket in pairs(trinketsFolder:GetChildren()) do
+                    if trinket:IsA("BasePart") then
+                        character.HumanoidRootPart.CFrame = trinket.CFrame
+                        local args = {
+                            [1] = "Accept",
+                            [2] = trinket
+                        }
+                        ReplicatedStorage.Remotes.ClientToServer.Artifact:FireServer(unpack(args))
+                    elseif trinket:IsA("Model") and trinket.PrimaryPart then
+                        character.HumanoidRootPart.CFrame = trinket.PrimaryPart.CFrame
+                        local args = {
+                            [1] = "Accept",
+                            [2] = trinket
+                        }
+                        ReplicatedStorage.Remotes.ClientToServer.Artifact:FireServer(unpack(args))
+                    end
+                    wait(0.2)
+                end
+            end
+            wait(0.5)
+        end
+    end
+
+    local AutoSell_Active = false
+    local function AutoSell(state)
+        AutoSell_Active = state
+
+        while AutoSell_Active do
+            local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+            local backpack = LocalPlayer.Backpack
+
+            local sellList = {
+                "Ancient Capoeira Manual", "Hanma's Blood", "Retsu's Arm", "Musashi Soul",
+                "Gomu Gomu no Mi", "Goro Goro no Mi", "Suke Suke no Mi", "Supreme Dumbell",
+                "Motobe's Chainmail", "Bloodthirst", "Brawler's Bandages", "Doyle's Bomb",
+                "Bodhisattva Blessing", "Yasha Ape's Tooth", "Brass Knuckles", "Stone Mask",
+                "Compound V", "Unstable Energy", "Soul Knife", "Bible", "Temporal Dagger",
+                "Hollowfication", "Bald Crown", "Well of Radiance", "Sukuna's Finger", "Doa Doa no Mi"
+            }
+
+            for _, tool in ipairs(backpack:GetChildren()) do
+                if tool:IsA("Tool") and table.find(sellList, tool.Name) then
+                    tool.Parent = character
+                    wait(0.2)
+                    local args = {
+                        [1] = "Sell",
+                        [2] = tool.Name
+                    }
+                    ReplicatedStorage.Remotes.ClientToServer.Artifact:FireServer(unpack(args))
+                    wait(0.2)
+                end
+            end
+            wait(1)
+        end
+    end
+
+    local AutoUse_Active = false
+
+    local function AutoUse(state)
+	AutoUse_Active = state
+
+	local targets = {
+		"Trick or Treat Essence",
+		"Dark Continent Artifact"
+	}
+
+	local function findTarget()
+		local char = LocalPlayer.Character
+		local bp = LocalPlayer:FindFirstChild("Backpack")
+		for _, name in ipairs(targets) do
+			if bp then
+				local it = bp:FindFirstChild(name)
+				if it then return it end
+			end
+			if char then
+				local it = char:FindFirstChild(name)
+				if it then return it end
+			end
+		end
+		return nil
+	end
+
+	while AutoUse_Active do
+		local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+		local item = findTarget()
+		if item then
+			pcall(function()
+				item.Parent = character
+			end)
+
+			wait(0.2)
+
+			pcall(function()
+				if type(item.Activate) == "function" then
+					item:Activate()
+				end
+			end)
+
+			wait(0.5)
+		else
+			wait(1)
+		end
+	end
+end
+
+    autoFarmTab:AddLabel("AutoFarm Features", {
+        TextSize = 18,
+        TextColor3 = theme.accent,
+        TextXAlignment = Enum.TextXAlignment.Center
+    })
+
+    autoFarmTab:AddSwitch("God Mode (need private server)", function(state)
+        ToggleFollowPlayer(state)
+    end):Set(false)
+
+    autoFarmTab:AddSwitch("One Shot Kill", function(state)
+        OneShotMode(state)
+    end):Set(false)
+
+    autoFarmTab:AddSwitch("Auto Level Farm", function(state)
+    AutoLevel(state)
+end):Set(false)
+
+    autoFarmTab:AddSwitch("Auto Imagination Farm", function(state)
+    AutoShadow(state)
+end):Set(false)
+
+    autoFarmTab:AddSwitch("Auto Balraxion", function(state)
+        AutoBalraxion(state)
+    end):Set(false)
+
+    local balraxionSpeedDropdown = autoFarmTab:AddDropdown("Attack Speed", function(value)
+        local n = tonumber(value)
+        if n then
+            AutoBalraxion_Speed = n
+        end
+    end)
+
+    balraxionSpeedDropdown:Add("0.1")
+    balraxionSpeedDropdown:Add("0.2")
+    balraxionSpeedDropdown:Add("0.3")
+
+            autoFarmTab:AddSwitch("Auto Use Balraxion Item", function(state)
+        AutoUse(state)
+    end):Set(false)
+
+    autoFarmTab:AddSwitch("Auto Island", function(state)
+        AutoIsland(state)
+    end):Set(false)
+
+    autoFarmTab:AddSwitch("Auto Boss Rush", function(state)
+        AutoBR(state)
+    end):Set(false)
+
+    autoFarmTab:AddSwitch("Auto Collect Relics", function(state)
+        AutoRelic(state)
+    end):Set(false)
+
+    autoFarmTab:AddSwitch("Auto Sell Relics", function(state)
+        AutoSell(state)
+    end):Set(false)
+
+    teleportTab:AddLabel("Teleport Locations", {
+        TextSize = 18,
+        TextColor3 = theme.accent,
+        TextXAlignment = Enum.TextXAlignment.Center
+    })
+
+    local trainersFolder = workspace.Game:FindFirstChild("Trainers")
+    local dropdown = teleportTab:AddDropdown("Select Trainer", function(text)
+        if trainersFolder and trainersFolder:FindFirstChild(text) then
+            local trainer = trainersFolder[text]
+            if trainer:FindFirstChild("Head") then
+                LocalPlayer.Character:SetPrimaryPartCFrame(trainer.Head.CFrame)
+            end
+        end
+    end)
+
+    if trainersFolder then
+        for _, trainer in pairs(trainersFolder:GetChildren()) do
+            if trainer:IsA("Model") then
+                dropdown:Add(trainer.Name)
+            end
+        end
+    end
+
+    teleportTab:AddTextBox("Search Trainer", function(text)
+        if trainersFolder then
+            for _, trainer in pairs(trainersFolder:GetChildren()) do
+                if trainer:IsA("Model") and trainer.Name:lower():find(text:lower()) then
+                    if trainer:FindFirstChild("Head") then
+                        LocalPlayer.Character:SetPrimaryPartCFrame(trainer.Head.CFrame)
+                        break
+                    end
+                end
+            end
+        end
+    end)
+
+    miscTab:AddLabel("Misc Features", {
+        TextSize = 18,
+        TextColor3 = theme.accent,
+        TextXAlignment = Enum.TextXAlignment.Center
+    })
+
+    miscTab:AddButton("Akuma Custom Skills E and Y TO USE", function()
+        loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Jivxhaha/PPN/refs/heads/main/Aku'))()
+    end)
+
+    miscTab:AddButton("Max Level (One Time)", function()
+        ReplicatedStorage.Remotes.ChristGift:FireServer()
+    end)
+
+    miscTab:AddButton("Become Hanma", function()
+        LocalPlayer.UserId = 698869311
+    end)
+
+    miscTab:AddButton("Gamepass Unlock", function()
+        LocalPlayer.UserId = 698869311
+    end)
+
+    miscTab:AddButton("Infinite Yield", function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+    end)
+
+    miscTab:AddButton("Server Hop", function()
+        local function ListServers(cursor)
+            local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
+            return HttpService:JSONDecode(Raw)
+        end
+
+        while wait(1) do
+            LocalPlayer.Character.HumanoidRootPart.Anchored = true
+            local Servers = ListServers()
+            local Server = Servers.data[math.random(1, #Servers.data)]
+            TeleportService:TeleportToPlaceInstance(_place, Server.id, LocalPlayer)
+        end
+    end)
+
+    miscTab:AddLabel("Thank you for using PB3 Sigma", {
+        TextSize = 14,
+        TextColor3 = Color3.fromRGB(150, 150, 150),
+        TextXAlignment = Enum.TextXAlignment.Center
+    })
+
+    autoFarmTab:Show()
