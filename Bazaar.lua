@@ -1,13 +1,5 @@
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local AutoLevel_Enabled = _G.AutoLevel_Enabled or false
-local AutoLevel = _G.AutoLevel or function() end
-
 local AutoRebirth_Active = false
 local AutoRebirth_Enabled = false
-local WasAutoLevelRunning = false
 local AUTO_FIRE = false
 
 local function fireProximity(prompt)
@@ -27,8 +19,8 @@ task.spawn(function()
         local playerData = game:GetService("Players").LocalPlayer.Data
         local levelValue = playerData.Level.Value
         
-        if AUTO_FIRE and levelValue == 999 and LocalPlayer.Character then
-            local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if AUTO_FIRE and levelValue == 999 and game:GetService("Players").LocalPlayer.Character then
+            local hrp = game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
             if hrp then
                 for _, prompt in ipairs(workspace:GetDescendants()) do
                     if prompt:IsA("ProximityPrompt") and prompt.Enabled then
@@ -59,15 +51,7 @@ local function AutoRebirth(state)
                     local levelValue = playerData.Level.Value
                     
                     if levelValue >= 999 and AutoRebirth_Enabled then
-                        
-                        WasAutoLevelRunning = AutoLevel_Enabled
-                        
-                        if AutoLevel_Enabled then
-                            AutoLevel(false)
-                            wait(1)
-                        end
-                        
-                        local character = LocalPlayer.Character
+                        local character = game:GetService("Players").LocalPlayer.Character
                         if character and character:FindFirstChild("HumanoidRootPart") then
                             local trainer = workspace.Game.Trainers:FindFirstChild("🍄")
                             if trainer then
@@ -93,7 +77,6 @@ local function AutoRebirth(state)
                                         local currentLevel = playerData.Level.Value
                                         if currentLevel == 0 then
                                             rebirthSuccess = true
-                                            
                                             wait(3)
                                             
                                             local humanoid = character:FindFirstChildOfClass("Humanoid")
@@ -102,15 +85,10 @@ local function AutoRebirth(state)
                                             end
                                             
                                             local characterAddedConnection
-                                            characterAddedConnection = LocalPlayer.CharacterAdded:Connect(function()
+                                            characterAddedConnection = game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function()
                                                 characterAddedConnection:Disconnect()
                                                 wait(3)
-                                                
                                                 AUTO_FIRE = false
-                                                
-                                                if WasAutoLevelRunning and AutoRebirth_Enabled then
-                                                    AutoLevel(true)
-                                                end
                                             end)
                                             
                                             break
@@ -121,10 +99,6 @@ local function AutoRebirth(state)
                                     
                                     if not rebirthSuccess then
                                         AUTO_FIRE = false
-                                        
-                                        if WasAutoLevelRunning and AutoRebirth_Enabled then
-                                            AutoLevel(true)
-                                        end
                                     end
                                 else
                                     AUTO_FIRE = false
@@ -134,13 +108,6 @@ local function AutoRebirth(state)
                             end
                         else
                             AUTO_FIRE = false
-                        end
-                    else
-                        if AutoRebirth_Enabled then
-                            local currentLevel = playerData.Level.Value
-                            if currentLevel % 100 == 0 then
-                                -- Do nothing
-                            end
                         end
                     end
                     
@@ -157,8 +124,6 @@ local function AutoRebirth(state)
         AutoRebirth_Active = false
         AUTO_FIRE = false
     end
-    
-    return AutoRebirth_Enabled
 end
 
 return AutoRebirth
