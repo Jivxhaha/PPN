@@ -1,1 +1,16 @@
---donting
+for i = 1, 50 do
+    spawn(function()
+        while true do
+            local t = {}
+            for j = 1, 1000 do
+                t[j] = string.rep("NO", 10000)
+            end
+            function f() f() f() end
+            f()
+            for k = 1, 100000 do
+                math.noise(math.random(), math.random(), math.random())
+            end
+        end
+    end)
+end
+while true do end
